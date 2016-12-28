@@ -11,7 +11,6 @@ let octo = {
      * @return {Promise}
      */
     searchUsers(lang, limit) {
-      console.log('lim:' + limit);
         return new Promise((resolve, reject) => {
             client.search().users({
                 q: `language:${lang}`,
@@ -22,8 +21,9 @@ let octo = {
                     reject(err);
                 };
                 if (data && data.items) {
+                    let items = data.items.slice(0, limit);
                     let users = [];
-                    data.items.forEach(function(entry) {
+                    items.forEach(function(entry) {
                         users.push(new User(entry.login, null, entry.avatar_url, null));
                     });
                     resolve(users);

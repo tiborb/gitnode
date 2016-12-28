@@ -1,6 +1,6 @@
 {
   "oauth":  {
-    "token":
+    "token": null
   },
   "limit": 10000
 }

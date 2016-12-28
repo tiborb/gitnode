@@ -27,11 +27,6 @@ server.route({
             limit: Joi.number().integer().min(1).max(99999999),
         }).with('lang', 'limit');
 
-        let onError = (err) => {
-           console.error(err);
-           return reply(err);
-        };
-
         let errors = Joi.validate({lang: lang, limit: limit}, schema);
 
         if (null === errors.error) {
@@ -39,9 +34,13 @@ server.route({
           .then((users) => reply({
                   users: users,
               }))
-           .catch(onError);
+           .catch((err) => {
+              console.error(err);
+              return reply(err);
+           });
         } else {
-          onError(errors);
+            let Boom = require('boom');
+            return reply(Boom.badRequest('Invalid request'));
         }
       },
   });
