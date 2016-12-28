@@ -7,9 +7,11 @@ let octo = {
 
     /**
      * @param {String} lang
+     * @param {Integer} limit
      * @return {Promise}
      */
-    searchUsers(lang) {
+    searchUsers(lang, limit) {
+      console.log('lim:' + limit);
         return new Promise((resolve, reject) => {
             client.search().users({
                 q: `language:${lang}`,
@@ -39,13 +41,13 @@ let octo = {
             let promises = users.map((user) => {
                 return new Promise((res, rej) => {
                     client.user(user.username).info(function(err, data) {
-                        if (err) {
+                        if (err || 'undefined' === typeof data) {
                             rej(err);
-                        };
-                        user.name = data.name;
-                        user.followers = data.followers;
-
-                        res(user);
+                        } else {
+                          user.name = data.name;
+                          user.followers = data.followers;
+                          res(user);
+                        }
                     });
                 });
             });
@@ -53,23 +55,27 @@ let octo = {
             Promise.all(promises)
                 .then((users) => {
                 resolve(users);
+            }).catch((err) => {
+              reject(err);
             });
         });
     },
 
     /**
      * @param {String} lang
+     * @param {Integer} limit
      * @return {Promise}
      */
-    searchByLang(lang) {
+    searchByLang(lang, limit) {
+        let max = limit || config.get('limit');
         return new Promise((resolve, reject) => {
-            octo.searchUsers(lang)
-            .then(octo.lookupUsers)
-            .then((users) => {
-                resolve(users);
-            }).catch((err) => {
-                reject(err);
-            });
+              octo.searchUsers(lang, max)
+              .then(octo.lookupUsers)
+              .then((users) => {
+                  resolve(users);
+              }).catch((err) => {
+                  reject(err);
+              });
         });
     },
 };

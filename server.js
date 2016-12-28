@@ -2,6 +2,7 @@ const Hapi = require('hapi');
 const halacious = require('halacious');
 const octo = require('./src/search/octo');
 const server = new Hapi.Server();
+const Joi = require('joi');
 
 server.connection({
     host: 'localhost',
@@ -20,13 +21,28 @@ server.route({
     path: '/users/{lang}',
     handler: function(request, reply) {
         let lang = request.params.lang;
-        octo.searchByLang(lang)
-        .then((users) => reply({
-                users: users,
-            }))
-         .catch((err) => {
-            return reply(err);
-        });
+        let limit = request.query.limit;
+        let schema = Joi.object().keys({
+            lang: Joi.string().alphanum().min(1).max(30).required(),
+            limit: Joi.number().integer().min(1).max(99999999),
+        }).with('lang', 'limit');
+
+        let onError = (err) => {
+           console.error(err);
+           return reply(err);
+        };
+
+        let errors = Joi.validate({lang: lang, limit: limit}, schema);
+
+        if (null === errors.error) {
+          octo.searchByLang(lang, limit)
+          .then((users) => reply({
+                  users: users,
+              }))
+           .catch(onError);
+        } else {
+          onError(errors);
+        }
       },
   });
 
