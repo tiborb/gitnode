@@ -19,4 +19,10 @@ curl -X GET localhost:8000/users/go?limit=20
 npm start
 ```
 
-Optionally the Oauth token can be filled as well to avoid any rate limitations
+### Run tests
+
+```
+npm test
+```
+
+Optionally the Oauth token can be filled as well in the config files to avoid any rate limitations

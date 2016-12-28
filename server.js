@@ -20,29 +20,25 @@ server.route({
     method: 'GET',
     path: '/users/{lang}',
     handler: function(request, reply) {
-        let lang = request.params.lang;
-        let limit = request.query.limit;
-        let schema = Joi.object().keys({
-            lang: Joi.string().alphanum().min(1).max(30).required(),
-            limit: Joi.number().integer().min(1).max(99999999),
-        }).with('lang', 'limit');
-
-        let errors = Joi.validate({lang: lang, limit: limit}, schema);
-
-        if (null === errors.error) {
-          octo.searchByLang(lang, limit)
-          .then((users) => reply({
-                  users: users,
-              }))
-           .catch((err) => {
-              console.error(err);
-              return reply(err);
-           });
-        } else {
-            let Boom = require('boom');
-            return reply(Boom.badRequest('Invalid request'));
-        }
+        octo.searchByLang(request.params.lang, request.query.limit)
+        .then((users) => reply({
+                users: users,
+            }))
+         .catch((err) => {
+            console.error(err);
+            return reply(err);
+         });
       },
+      config: {
+        validate: {
+            params: {
+              lang: Joi.string().alphanum().min(1).max(30).required(),
+            },
+            query: {
+              limit: Joi.number().integer().min(1).max(999999),
+            },
+        },
+    },
   });
 
 // Start the server
@@ -53,3 +49,5 @@ server.start((err) => {
 
     console.log('Server running at:', server.info.uri);
   });
+
+module.exports = server;
