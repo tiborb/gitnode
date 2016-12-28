@@ -1,7 +1,7 @@
 {
   "name": "gitnode",
-  "version": "0.0.0",
-  "description": "Search for github users by the programming laguare in ther public repo",
+  "version": "1.0.0",
+  "description": "Search for github users by the programming language in ther public repo",
   "main": "server.js",
   "scripts": {
     "test": "./node_modules/.bin/lab test",
